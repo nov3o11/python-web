@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python 運算思維與基礎程式設計 - 深度互動科技講義</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            dark: '#070A13',
+                            panel: '#0F172A',
+                            card: '#111827',
+                            border: '#1E293B',
+                            accent: '#3B82F6',
+                            neon: '#06B6D4',
+                            purple: '#8B5CF6',
+                            emerald: '#10B981',
+                            amber: '#F59E0B',
+                            rose: '#F43F5E'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070A13;
+            color: #E2E8F0;
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0F19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3B82F6;
+        }
+        .glow-border {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.12);
+        }
+        .glow-border:hover {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.25);
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #60A5FA 0%, #2DD4BF 50%, #A78BFA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-black">
+
+    <!-- Top Reading Progress Indicator -->
+    <div class="fixed top-0 left-0 right-0 h-1 bg-slate-800 z-50">
+        <div id="learning-progress-bar" class="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 w-0 transition-all duration-300"></div>
+    </div>
+
+    <!-- Background Animated Grid -->
+    <div class="fixed inset-0 pointer-events-none opacity-20 z-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px]"></div>
+
+    <!-- Toast Notification for Alert -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out flex items-center gap-3 bg-slate-900 border border-cyan-500/50 text-cyan-300 px-5 py-3 rounded-xl shadow-2xl backdrop-blur-lg">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-xl text-emerald-400"></i>
+        <div>
+            <div id="toast-title" class="font-bold text-sm">複製成功！</div>
+            <div id="toast-desc" class="text-xs text-slate-400">已複製至剪貼簿，可直接貼上至 Spyder 執行。</div>
+        </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <i class="fa-brands fa-python text-2xl text-white"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-lg tracking-wider text-white">PYTHON<span class="text-cyan-400">LAB</span></span>
+                    <span class="hidden sm:inline-block text-xs bg-cyan-950 text-cyan-400 px-2.5 py-0.5 rounded-full border border-cyan-800/50 ml-2 font-medium">Spyder 實戰教學版</span>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation Links -->
+            <nav class="hidden md:flex items-center space-x-1 text-xs font-semibold">
+                <a href="#ch01" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition">CH01 運算思維與環境</a>
+                <a href="#spyder-interactive" class="px-3 py-2 rounded-lg text-cyan-400 hover:bg-cyan-950/40 transition"><i class="fa-solid fa-desktop mr-1"></i>Spyder 模擬器</a>
+                <a href="#ch02" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition">CH02 變數與運算式</a>
+                <a href="#debug-lab" class="px-3 py-2 rounded-lg text-rose-400 hover:bg-rose-950/40 transition"><i class="fa-solid fa-bug mr-1"></i>除錯診斷室</a>
+                <a href="#fstring-lab" class="px-3 py-2 rounded-lg text-emerald-400 hover:bg-emerald-950/40 transition"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>F-String 實驗室</a>
+                <a href="#lab" class="px-3 py-2 rounded-lg text-purple-400 hover:bg-purple-950/40 transition"><i class="fa-solid fa-flask mr-1"></i>實戰程式庫</a>
+                <a href="#quiz" class="px-3 py-2 rounded-lg text-amber-400 hover:bg-amber-950/40 transition"><i class="fa-solid fa-check-double mr-1"></i>觀念測驗</a>
+            </nav>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-slate-300 hover:text-white p-2 text-xl focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-800 bg-slate-900/95 px-4 pt-2 pb-4 space-y-2 text-sm">
+            <a href="#ch01" class="block px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800">CH01 運算思維與環境</a>
+            <a href="#spyder-interactive" class="block px-3 py-2 rounded-lg text-cyan-400 hover:bg-slate-800">Spyder 互動工作區</a>
+            <a href="#ch02" class="block px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800">CH02 變數與運算式</a>
+            <a href="#debug-lab" class="block px-3 py-2 rounded-lg text-rose-400 hover:bg-slate-800">除錯診斷室</a>
+            <a href="#fstring-lab" class="block px-3 py-2 rounded-lg text-emerald-400 hover:bg-slate-800">F-String 排版實驗室</a>
+            <a href="#lab" class="block px-3 py-2 rounded-lg text-purple-400 hover:bg-slate-800">實戰範例庫</a>
+            <a href="#quiz" class="block px-3 py-2 rounded-lg text-amber-400 hover:bg-slate-800">觀念隨堂測驗</a>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16 relative z-10">
+
+        <!-- Hero Section -->
+        <section class="relative rounded-3xl overflow-hidden glass-panel p-8 sm:p-12 border border-slate-800 glow-border">
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="max-w-4xl space-y-6">
+                <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-semibold text-cyan-400">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>2026 深度強化版課程講義 • 專為 Spyder IDE 實戰優化</span>
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+                    掌握 <span class="gradient-text">Python 運算思維</span><br>從基礎語法到高階開發
+                </h1>
+
+                <!-- Revised Disclaimer Card (Integration of Revised Safe Copyright Statement) -->
+                <div class="bg-cyan-950/40 border-l-4 border-cyan-400 p-4 rounded-r-2xl space-y-1 text-xs sm:text-sm text-cyan-200">
+                    <div class="font-bold flex items-center gap-2 text-cyan-300">
+                        <i class="fa-solid fa-shield-halved text-cyan-400"></i>
+                        <span>教學與版權安全聲明</span>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        本講義以附件教材之「知識主題與學習順序」作為教學與邏輯參考；所有示範情境、程式案例與隨堂測驗均重新設計；教材僅作為本單元知識範圍與學習順序的參考，不直接沿用原教材的案例情境。
+                    </p>
+                </div>
+
+                <p class="text-slate-400 text-base sm:text-lg leading-relaxed">
+                    本講義補足電腦底層原理、記憶體位址指派模型、現代 F-String 格式化排版與 Spyder IDE 實務除錯技巧。提供一鍵複製與直接載入至模擬器功能，讓您順暢進行直譯與除錯實作！
+                </p>
+
+                <div class="flex flex-wrap gap-4 pt-2">
+                    <a href="#ch01" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold text-white shadow-lg shadow-cyan-500/25 hover:brightness-110 transition flex items-center space-x-2 text-sm">
+                        <span>開始探索單元</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                    <a href="#spyder-interactive" class="px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 font-semibold text-cyan-400 transition flex items-center space-x-2 text-sm">
+                        <i class="fa-solid fa-desktop"></i>
+                        <span>體驗 Spyder 模擬介面</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 01 -->
+        <section id="ch01" class="space-y-8">
+            <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold text-cyan-400 tracking-wider uppercase">CHAPTER 01</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">運算思維與 Python / Spyder 開發環境</h2>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-slate-400">
+                    <span class="px-2.5 py-1 bg-slate-800 rounded-md border border-slate-700">Anaconda 3</span>
+                    <span class="px-2.5 py-1 bg-slate-800 rounded-md border border-slate-700">Spyder 5+</span>
+                </div>
+            </div>
+
+            <!-- 1.1 Computational Thinking 4 Core Pillars -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-brain text-cyan-400"></i>
+                    1.1 運算思維的四大核心支柱 (Computational Thinking)
+                </h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    運算思維（Jeannette Wing 提出）並非單純學會寫程式，而是利用電腦科學的概念來解決問題的思考邏輯過程。包含以下四個不可或缺的階段：
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-blue-500/50 transition">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold mb-3">01</div>
+                        <h4 class="font-bold text-white text-base">拆解問題 (Decomposition)</h4>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">將複雜大問題剖析、分解為數個較小、可單獨處理的子問題。</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold mb-3">02</div>
+                        <h4 class="font-bold text-white text-base">發現規律 (Pattern Recognition)</h4>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">觀察資料中重複出現的趨勢、特徵或規律性，找到共同模式。</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-purple-500/50 transition">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold mb-3">03</div>
+                        <h4 class="font-bold text-white text-base">歸納抽象 (Abstraction)</h4>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">過濾非必要的細節，聚焦於核心公式與一般性運作原則。</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/50 transition">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold mb-3">04</div>
+                        <h4 class="font-bold text-white text-base">設計演算法 (Algorithm)</h4>
+                        <p class="text-xs text-slate-400 mt-2 leading-relaxed">規劃出解決問題的明確步驟流程，讓電腦得以自動精確執行。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.2 & 1.3 Environment & Commands -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Python Characteristics -->
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-cube text-purple-400"></i>
+                        1.2 Python 語言核心優勢
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
+                            <span><strong>直譯式 (Interpreted)：</strong>無需預先編譯即可透過 Python 直譯器逐行執行，除錯測試極其快速。</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
+                            <span><strong>動態型態 (Dynamic Typing)：</strong>變數不需事先宣告資料型態，記憶體指派由直譯器於執行期動態處理。</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
+                            <span><strong>高階豐富生態系：</strong>內建 Batteries-Included 理念，並支援數百萬第三方套件 (NumPy, Pandas, SciPy)。</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Anaconda Prompt Commands -->
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-cyan-400"></i>
+                        1.3 Anaconda Prompt 必學套件管理指令
+                    </h3>
+                    <div class="bg-slate-950 p-4 rounded-xl code-font text-xs space-y-2 border border-slate-800">
+                        <p class="text-slate-500"># 檢視目前已安裝之套件列表</p>
+                        <p class="text-emerald-400">conda list <span class="text-slate-400">或</span> pip list</p>
+                        <p class="text-slate-500 mt-2"># 安裝/更新第三方套件 (以 requests 為例)</p>
+                        <p class="text-emerald-400">conda install requests</p>
+                        <p class="text-slate-500 mt-2"># 啟動 Spyder 整合開發環境</p>
+                        <p class="text-emerald-400">spyder</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.4 Interactive Spyder Workspace Mockup with Live Interactive Console -->
+            <div id="spyder-interactive" class="glass-panel p-6 rounded-2xl space-y-4 border border-slate-800 glow-border">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-laptop-code text-cyan-400"></i>
+                            1.4 Spyder 介面三大核心區域（全功能互動式模擬器）
+                        </h3>
+                        <p class="text-xs text-slate-400">可點擊編輯區、變數瀏覽器或在 Console 中親自輸入 Python 指令測試！</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="resetSpyderSimulator()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 transition">
+                            <i class="fa-solid fa-rotate-left mr-1"></i>重置狀態
+                        </button>
+                        <button onclick="runSpyderSimulation()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-xs transition flex items-center gap-1.5 shadow">
+                            <i class="fa-solid fa-play"></i> 執行編輯區 (F5)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mockup Spyder Window Layout -->
+                <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-2xl">
+                    <!-- Title Bar -->
+                    <div class="bg-slate-900 px-4 py-2 flex items-center justify-between border-b border-slate-800 text-xs">
+                        <div class="flex items-center space-x-2 text-slate-400 font-mono">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                            <span class="ml-2 text-slate-300">Spyder (Python 3.10) - demo_script.py</span>
+                        </div>
+                        <span class="text-[10px] text-cyan-400 font-mono"><i class="fa-solid fa-circle text-[8px] text-emerald-400 animate-pulse mr-1"></i>Console Ready</span>
+                    </div>
+
+                    <!-- IDE Panels Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 min-h-[300px] divide-y md:divide-y-0 md:divide-x divide-slate-800">
+                        <!-- Pane 1: Editor -->
+                        <div id="pane-editor" onclick="selectPane('editor')" class="md:col-span-6 p-4 cursor-pointer hover:bg-slate-900/40 transition relative group">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-blue-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-code"></i> 1. 程式編輯區 (Editor)
+                                </span>
+                                <span class="text-[10px] text-slate-500 font-mono">demo_script.py</span>
+                            </div>
+                            <pre id="spyder-editor-code" class="code-font text-xs text-slate-300 space-y-1">
+<span class="text-slate-500"># -*- coding: utf-8 -*-</span>
+<span class="text-purple-400">name</span> = <span class="text-amber-300">"學生小明"</span>
+<span class="text-purple-400">score</span> = <span class="text-cyan-300">88.5</span>
+<span class="text-purple-400">passed</span> = score >= <span class="text-cyan-300">60</span>
+<span class="text-blue-400">print</span>(<span class="text-amber-300">f"{name} 測驗結果: {passed}"</span>)
+</pre>
+                            <div class="absolute bottom-2 right-2 text-[10px] text-slate-500 group-hover:text-blue-400 transition">點擊檢視說明 →</div>
+                        </div>
+
+                        <!-- Pane 2 & 3 Right Side -->
+                        <div class="md:col-span-6 grid grid-rows-2 divide-y divide-slate-800">
+                            <!-- Variable Explorer -->
+                            <div id="pane-variables" onclick="selectPane('variables')" class="p-3 cursor-pointer hover:bg-slate-900/40 transition group">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold text-purple-400 flex items-center gap-1">
+                                        <i class="fa-solid fa-table"></i> 2. 變數瀏覽區 (Variable Explorer)
+                                    </span>
+                                    <span id="spyder-var-count" class="text-[10px] text-slate-500">3 個變數在記憶體中</span>
+                                </div>
+                                <div class="overflow-x-auto max-h-[110px] overflow-y-auto">
+                                    <table class="w-full text-[11px] font-mono text-left text-slate-300">
+                                        <thead class="bg-slate-900 text-slate-400 sticky top-0">
+                                            <tr>
+                                                <th class="p-1">Name</th>
+                                                <th class="p-1">Type</th>
+                                                <th class="p-1">Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-800/60" id="spyder-var-table">
+                                            <tr><td class="p-1 text-cyan-300">name</td><td class="p-1 text-slate-500">str</td><td class="p-1 text-amber-300">'學生小明'</td></tr>
+                                            <tr><td class="p-1 text-cyan-300">score</td><td class="p-1 text-slate-500">float</td><td class="p-1 text-cyan-300">88.5</td></tr>
+                                            <tr><td class="p-1 text-cyan-300">passed</td><td class="p-1 text-slate-500">bool</td><td class="p-1 text-emerald-400">True</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- IPython Console with Live Interactive Input -->
+                            <div id="pane-console" onclick="selectPane('console')" class="p-3 cursor-pointer hover:bg-slate-900/40 transition group font-mono text-xs flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                                            <i class="fa-solid fa-terminal"></i> 3. IPython 命令視窗 (Live Console)
+                                        </span>
+                                        <span class="text-[10px] text-slate-500">試試輸入如 x = 100</span>
+                                    </div>
+                                    <div class="text-slate-400 text-[11px] space-y-1 max-h-[90px] overflow-y-auto" id="spyder-console-output">
+                                        <p class="text-slate-600">IPython 7.31.1 -- An enhanced Interactive Python.</p>
+                                        <p class="text-emerald-400">In [1]: runfile('demo_script.py')</p>
+                                        <p class="text-slate-200">學生小明 測驗結果: True</p>
+                                    </div>
+                                </div>
+
+                                <!-- Live Input Form inside IPython Console -->
+                                <form onsubmit="handleConsoleSubmit(event)" class="mt-2 flex items-center gap-2 bg-slate-900 px-2 py-1 rounded border border-slate-800">
+                                    <span class="text-emerald-400 text-[11px] font-bold">In [<span id="console-in-num">2</span>]:</span>
+                                    <input type="text" id="spyder-console-input" placeholder="輸入 Python 賦值或運算式，按 Enter 執行..." class="bg-transparent w-full text-xs text-slate-200 code-font focus:outline-none placeholder-slate-600">
+                                    <button type="submit" class="text-[10px] bg-cyan-900 hover:bg-cyan-800 text-cyan-300 px-2 py-0.5 rounded">送出</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Pane Explanation Card -->
+                <div id="pane-detail-card" class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-xs leading-relaxed text-slate-300">
+                    <span class="font-bold text-cyan-400 block mb-1">💡 點擊上方任意區塊：查看 Spyder 開發功能說明</span>
+                    <span>請點擊 <strong>「執行編輯區 (F5)」</strong> 按鈕示範，或直接在 Console 輸入 <code class="code-font text-cyan-300">a = 50</code>、<code class="code-font text-cyan-300">print(a)</code> 體驗即時變數榜定與輸出！</span>
+                </div>
+
+                <!-- Shortcuts Table -->
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-800/80 text-slate-300 font-semibold">
+                                <th class="p-2.5 rounded-l-lg">快捷鍵 (Shortcut)</th>
+                                <th class="p-2.5">功能說明</th>
+                                <th class="p-2.5 rounded-r-lg">Spyder 實務應用情境</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800 text-slate-400">
+                            <tr>
+                                <td class="p-2.5 code-font font-bold text-cyan-400">F5</td>
+                                <td class="p-2.5">執行整個程式 (Run file)</td>
+                                <td class="p-2.5">將目前編輯器中的檔案完全執行並印出 Console 結果</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 code-font font-bold text-cyan-400">F12</td>
+                                <td class="p-2.5">切換中斷點 (Toggle Breakpoint)</td>
+                                <td class="p-2.5">在游標所在行設定/取消紅點，供 Debug 模式暫停分析</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 code-font font-bold text-cyan-400">Tab</td>
+                                <td class="p-2.5">智慧補全 (Code Completion)</td>
+                                <td class="p-2.5">輸入變數或函式前幾個字母後按 Tab 自動補全名稱</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 code-font font-bold text-cyan-400">Ctrl + 1</td>
+                                <td class="p-2.5">單行/多行註解切換</td>
+                                <td class="p-2.5">快速對選取範圍加入或移除 `#` 註解</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 02 -->
+        <section id="ch02" class="space-y-8">
+            <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold text-purple-400 tracking-wider uppercase">CHAPTER 02</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">變數、資料型態與運算式全解析</h2>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-slate-400">
+                    <span class="px-2.5 py-1 bg-slate-800 rounded-md border border-slate-700">Python 3.x</span>
+                    <span class="px-2.5 py-1 bg-slate-800 rounded-md border border-slate-700">F-Strings 支援</span>
+                </div>
+            </div>
+
+            <!-- 2.1 Variable Concept & Memory Model -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-memory text-cyan-400"></i>
+                    2.1 變數本質與記憶體指派機制 (Memory Concept)
+                </h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    在電腦底層，記憶體位置是一串十六進位位址（例如 <code class="code-font text-cyan-300">0x7ffe567a</code>）。在 Python 中，<strong>「變數」</strong>並非像傳統 C 語言是固定的盒子，而是指向記憶體中物件的**標籤 (Reference/Pointer)**。
+                </p>
+
+                <!-- Interactive Memory Visualization Simulator -->
+                <div id="memory-sim" class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4 glow-border">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <h4 class="font-bold text-white text-base flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-emerald-400"></i>
+                            【互動元件】Python 記憶體指派與變數綁定視覺化模擬器
+                        </h4>
+                        <span class="text-xs text-slate-500">即時模擬 Python 物件引用機制</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-slate-300">變數名稱 1 (Variable A)</label>
+                            <input type="text" id="sim-var-1" value="Fruit" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs code-font text-cyan-300 focus:outline-none focus:border-cyan-500">
+                            <label class="text-xs font-semibold text-slate-300">儲存數值 (Value A)</label>
+                            <input type="text" id="sim-val-1" value="apple" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs code-font text-cyan-300 focus:outline-none focus:border-cyan-500">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-slate-300">變數名稱 2 (Variable B)</label>
+                            <input type="text" id="sim-var-2" value="Animal" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs code-font text-purple-300 focus:outline-none focus:border-purple-500">
+                            <label class="text-xs font-semibold text-slate-300">儲存數值 (Value B)</label>
+                            <input type="text" id="sim-val-2" value="bear" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs code-font text-purple-300 focus:outline-none focus:border-purple-500">
+                        </div>
+
+                        <div class="flex items-end">
+                            <button onclick="updateMemorySim()" class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 text-white font-bold py-2.5 px-4 rounded-lg text-xs transition shadow-lg shadow-cyan-500/20">
+                                更新記憶體快照 (Update RAM)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Memory Visual DOM Display -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <div class="text-xs text-slate-400 font-mono">系統記憶體 (RAM Blocks) 模擬動態檢視：</div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2" id="memory-blocks">
+                            <!-- Javascript rendered dynamic memory boxes -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Variable Rules & Naming Multi-Assignment -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="glass-panel p-5 rounded-xl border border-slate-800">
+                        <h4 class="font-bold text-white text-sm mb-3 text-cyan-400">變數命名與多重指定語法</h4>
+                        <div class="bg-slate-950 p-3 rounded-lg code-font text-xs space-y-2 border border-slate-800 text-slate-300">
+                            <p class="text-slate-500"># 多變數指定相同數值</p>
+                            <p>a = b = c = <span class="text-cyan-300">20</span></p>
+                            <p class="text-slate-500 mt-2"># 同一行指定多個變數 (Unpacking)</p>
+                            <p>age, name = <span class="text-cyan-300">18</span>, <span class="text-amber-300">"林大山"</span></p>
+                            <p class="text-slate-500 mt-2"># 刪除不使用的變數以釋放記憶體</p>
+                            <p><span class="text-purple-400">del</span> age</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-xl border border-slate-800">
+                        <h4 class="font-bold text-white text-sm mb-3 text-amber-400">命名規則與保留字禁忌</h4>
+                        <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>首字必須為大小寫英文字母、底線 <code class="code-font text-cyan-300">_</code> 或中文。</li>
+                            <li>英文字母嚴格區分大小寫（<code class="code-font text-cyan-300">Name</code> 與 <code class="code-font text-cyan-300">name</code> 代表不同變數）。</li>
+                            <li><strong>不可使用 Python 保留字：</strong>如 <code class="code-font text-rose-400">if, else, for, while, def, class, import, return, in, print</code> 等。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.2 Data Types & Type Conversion -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-shapes text-purple-400"></i>
+                    2.2 資料型態 (Data Types) 與強制轉型
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-blue-500/40 transition">
+                        <span class="px-2 py-0.5 rounded bg-blue-900/60 text-blue-300 font-mono font-bold">int</span>
+                        <h4 class="font-bold text-white mt-2 mb-1">整數型態</h4>
+                        <p class="text-slate-400">不含小數點的整數（如 `100`, `-5`）。Python 整數精確度不受 32/64 位元限制。</p>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-cyan-500/40 transition">
+                        <span class="px-2 py-0.5 rounded bg-cyan-900/60 text-cyan-300 font-mono font-bold">float</span>
+                        <h4 class="font-bold text-white mt-2 mb-1">浮點數型態</h4>
+                        <p class="text-slate-400">包含小數點的實數（如 `3.14159`, `12.0`）。</p>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-emerald-500/40 transition">
+                        <span class="px-2 py-0.5 rounded bg-emerald-900/60 text-emerald-300 font-mono font-bold">bool</span>
+                        <h4 class="font-bold text-white mt-2 mb-1">布林值型態</h4>
+                        <p class="text-slate-400">僅有 `True` 與 `False` 兩個值（注意首字母大寫），用於條件判斷。</p>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-amber-500/40 transition">
+                        <span class="px-2 py-0.5 rounded bg-amber-900/60 text-amber-300 font-mono font-bold">str</span>
+                        <h4 class="font-bold text-white mt-2 mb-1">字串型態</h4>
+                        <p class="text-slate-400">以單引號或雙引號包覆之文字序列（如 `"Python"`）。</p>
+                    </div>
+                </div>
+
+                <!-- Escape Sequences Table -->
+                <div class="glass-panel p-5 rounded-xl border border-slate-800 space-y-3">
+                    <h4 class="font-bold text-white text-sm">常見字串脫逸字元 (Escape Characters)</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs code-font">
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-cyan-400 font-bold">\n</span> : 換行 (Newline)
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-cyan-400 font-bold">\t</span> : Tab 定位鍵
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-cyan-400 font-bold">\\</span> : 顯示反斜線 \
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-cyan-400 font-bold">\"</span> : 顯示雙引號 "
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.3 NEW SECTION: Spyder Common Beginner Errors & Debugging Sandbox -->
+            <div id="debug-lab" class="space-y-4">
+                <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-bug text-rose-400"></i>
+                    2.3 Spyder 常見新手錯誤與除錯診斷室 (Debugging Sandbox)
+                </h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    在 Spyder 寫程式時，看到紅字 Traceback 報錯別慌張！點擊下方常見錯誤，觀看 Spyder 的報錯訊息與對應修正法：
+                </p>
+
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4 glow-border">
+                    <!-- Error Selectors -->
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <button onclick="showErrorCase('type-error')" class="error-btn border border-rose-500/50 bg-rose-950/40 text-rose-300 px-3 py-2 rounded-xl hover:bg-rose-900/50 transition active font-semibold">
+                            1. TypeError (型態無法串接)
+                        </button>
+                        <button onclick="showErrorCase('indent-error')" class="error-btn border border-slate-700 bg-slate-900 text-slate-300 px-3 py-2 rounded-xl hover:bg-slate-800 transition font-semibold">
+                            2. IndentationError (縮排錯誤)
+                        </button>
+                        <button onclick="showErrorCase('name-error')" class="error-btn border border-slate-700 bg-slate-900 text-slate-300 px-3 py-2 rounded-xl hover:bg-slate-800 transition font-semibold">
+                            3. NameError (變數未定義)
+                        </button>
+                        <button onclick="showErrorCase('syntax-error')" class="error-btn border border-slate-700 bg-slate-900 text-slate-300 px-3 py-2 rounded-xl hover:bg-slate-800 transition font-semibold">
+                            4. SyntaxError (語法錯誤)
+                        </button>
+                    </div>
+
+                    <!-- Diagnostic Display Box -->
+                    <div id="error-diag-card" class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4 text-xs font-mono">
+                        <!-- JS injected content -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.4 Input/Output & String Formatting + Interactive F-String Lab -->
+            <div class="space-y-4" id="fstring-lab">
+                <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-right-left text-emerald-400"></i>
+                    2.4 輸入、輸出與高階字串格式化 (I/O & Formatting)
+                </h3>
+
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    <code class="code-font text-cyan-300">input()</code> 命令接收使用者輸入，**請注意：輸入結果必定為字串 (str) 型態**，若需算術運算必須以 <code class="code-font text-purple-300">int()</code> 或 <code class="code-font text-purple-300">float()</code> 強制轉型！
+                </p>
+
+                <!-- Interactive F-String Live Playground -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4 glow-border">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                        <h4 class="font-bold text-emerald-400 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            【互動元件】F-String 即時格式化動態實驗室
+                        </h4>
+                        <span class="text-xs text-slate-400">調整下方參數，即時預覽 Python 排版成果</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">姓名變數 (name)</label>
+                            <input type="text" id="fmt-name" value="張小華" oninput="updateFStringPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-cyan-300 code-font focus:outline-none focus:border-emerald-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">分數變數 (score)</label>
+                            <input type="number" id="fmt-score" value="92.456" step="0.001" oninput="updateFStringPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-cyan-300 code-font focus:outline-none focus:border-emerald-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">欄位總寬度 (Width)</label>
+                            <input type="number" id="fmt-width" value="10" min="5" max="20" oninput="updateFStringPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-cyan-300 code-font focus:outline-none focus:border-emerald-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-300 font-medium mb-1">小數點位數 (Precision)</label>
+                            <input type="number" id="fmt-precision" value="2" min="0" max="4" oninput="updateFStringPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-cyan-300 code-font focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+
+                    <!-- F-String Output Preview Panel -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-[11px] text-slate-500 font-bold block">Python 程式碼 (Code)</span>
+                            <pre id="fmt-code-display" class="code-font text-xs text-amber-300 overflow-x-auto">print(f"{name:&lt;10} 得分: {score:10.2f}")</pre>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-[11px] text-emerald-400 font-bold block">Console 輸出結果 (Result Preview)</span>
+                            <pre id="fmt-result-display" class="code-font text-xs text-emerald-300 bg-slate-900 p-2 rounded border border-slate-800 whitespace-pre overflow-x-auto"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison of Formatting methods -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <span class="text-xs text-slate-400 font-bold">方法 1：傳統 `%` 格式化</span>
+                        <div class="bg-slate-950 p-3 rounded code-font text-xs text-slate-300">
+                            name = "小明"<br>
+                            score = 95.5<br>
+                            print(<span class="text-amber-300">"%s 的分數為: %.1f"</span> % (name, score))
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <span class="text-xs text-slate-400 font-bold">方法 2：`.format()` 語法</span>
+                        <div class="bg-slate-950 p-3 rounded code-font text-xs text-slate-300">
+                            name = "小明"<br>
+                            score = 95.5<br>
+                            print(<span class="text-amber-300">"{} 的分數為: {:.1f}"</span>.format(name, score))
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-emerald-500 text-black font-extrabold text-[10px] px-2 py-0.5 rounded-bl">最推薦</div>
+                        <span class="text-xs text-emerald-400 font-bold">方法 3：現代 Python F-String</span>
+                        <div class="bg-slate-950 p-3 rounded code-font text-xs text-slate-300">
+                            name = "小明"<br>
+                            score = 95.5<br>
+                            print(<span class="text-amber-300">f"{name} 的分數為: {score:.1f}"</span>)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.5 Operators and Expression Live Evaluator Sandbox -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-amber-400"></i>
+                    2.5 運算子與優先順序 (Operators Sandbox)
+                </h3>
+
+                <!-- Operator Live Evaluator -->
+                <div class="glass-panel p-5 rounded-xl border border-slate-800 space-y-3">
+                    <h4 class="font-bold text-white text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-flask-vial text-amber-400"></i>
+                        【即時測驗】Python 運算式估算器
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button onclick="evalExpr('17 // 5')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-left text-xs code-font">
+                            <div class="text-cyan-400 font-bold">17 // 5</div>
+                            <div class="text-slate-400 text-[10px]">整數商運算 (Floor Division)</div>
+                        </button>
+                        <button onclick="evalExpr('17 % 5')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-left text-xs code-font">
+                            <div class="text-cyan-400 font-bold">17 % 5</div>
+                            <div class="text-slate-400 text-[10px]">取餘數運算 (Modulus)</div>
+                        </button>
+                        <button onclick="evalExpr('2 ** 4')" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg text-left text-xs code-font">
+                            <div class="text-cyan-400 font-bold">2 ** 4</div>
+                            <div class="text-slate-400 text-[10px]">次方指數 (Exponentiation)</div>
+                        </button>
+                    </div>
+                    <div id="eval-result-box" class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs font-mono text-emerald-400 hidden">
+                        <!-- Calculated result via JS -->
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                    <!-- Arithmetic -->
+                    <div class="glass-panel p-4 rounded-xl space-y-2">
+                        <h4 class="font-bold text-cyan-400">算術運算子</h4>
+                        <p class="text-slate-400"><code class="code-font text-white">+ - * /</code> 一般加減乘除</p>
+                        <p class="text-slate-400"><code class="code-font text-amber-300">%</code> 取餘數 (例如 <code class="code-font">7 % 3 → 1</code>)</p>
+                        <p class="text-slate-400"><code class="code-font text-amber-300">//</code> 取整數商 (例如 <code class="code-font">7 // 3 → 2</code>)</p>
+                        <p class="text-slate-400"><code class="code-font text-amber-300">**</code> 次方/指數 (例如 <code class="code-font">2 ** 3 → 8</code>)</p>
+                    </div>
+
+                    <!-- Comparison -->
+                    <div class="glass-panel p-4 rounded-xl space-y-2">
+                        <h4 class="font-bold text-purple-400">比較與邏輯運算子</h4>
+                        <p class="text-slate-400"><code class="code-font text-white">== != > &lt; >= &lt;=</code> 傳回 <code class="code-font text-emerald-400">True/False</code></p>
+                        <p class="text-slate-400"><code class="code-font text-purple-300">and</code> : 兩者皆真才為真</p>
+                        <p class="text-slate-400"><code class="code-font text-purple-300">or</code> : 任一為真即為真</p>
+                        <p class="text-slate-400"><code class="code-font text-purple-300">not</code> : 結果反轉</p>
+                    </div>
+
+                    <!-- Compound Assignment -->
+                    <div class="glass-panel p-4 rounded-xl space-y-2">
+                        <h4 class="font-bold text-emerald-400">複合指定運算子</h4>
+                        <p class="text-slate-400"><code class="code-font text-white">i += 3</code> 即 <code class="code-font">i = i + 3</code></p>
+                        <p class="text-slate-400"><code class="code-font text-white">i -= 2</code> 即 <code class="code-font">i = i - 2</code></p>
+                        <p class="text-slate-400"><code class="code-font text-white">i *= 5</code> 即 <code class="code-font">i = i * 5</code></p>
+                        <p class="text-slate-400"><code class="code-font text-white">i /= 2</code> 即 <code class="code-font">i = i / 2</code></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRACTICAL CODE LAB FOR SPYDER -->
+        <section id="lab" class="space-y-8">
+            <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase">PRACTICAL LAB</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Spyder 實戰範例程式碼庫</h2>
+                </div>
+                <span class="text-xs text-slate-400">可點選「複製」或「載入至 Spyder 模擬器」觀察</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Example 1: Grade Formatting Sheet -->
+                <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden flex flex-col">
+                    <div class="bg-slate-900/90 px-5 py-3 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            <span class="font-bold text-xs text-slate-200 code-font ml-2">ch02_format_grades.py</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="loadCodeToSpyder('code-ex-1')" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-desktop"></i>
+                                <span>載入模擬器</span>
+                            </button>
+                            <button onclick="copyCode('code-ex-1', this)" class="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                                <i class="fa-regular fa-copy"></i>
+                                <span>複製程式碼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5 flex-grow space-y-2">
+                        <p class="text-xs text-slate-400"><strong>範例目標：</strong>對齊格式化輸出，解決表格輸出排版不整齊問題。</p>
+                        <pre><code id="code-ex-1" class="code-font text-xs text-slate-200 leading-relaxed block overflow-x-auto bg-slate-950 p-4 rounded-xl border border-slate-800"># -*- coding: utf-8 -*-
+"""
+檔名: ch02_format_grades.py
+說明: 格式化列印班級成績單 (適用於 Spyder IDE 執行)
+"""
+
+print("=" * 40)
+print(f"{'姓名':&lt;6} {'座號':&lt;4} {'國文':>5} {'數學':>5} {'英文':>5}")
+print("-" * 40)
+
+# 學生成績資料對齊格式化
+print(f"{'林大明':&lt;6} {1:&lt;4} {100:>5} {87:>5} {79:>5}")
+print(f"{'陳阿中':&lt;6} {2:&lt;4} {74:>5} {88:>5} {100:>5}")
+print(f"{'張小英':&lt;6} {3:&lt;4} {82:>5} {65:>5} {85:>5}")
+print("=" * 40)
+</code></pre>
+                    </div>
+                </div>
+
+                <!-- Example 2: Trapezoid Area Calculator -->
+                <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden flex flex-col">
+                    <div class="bg-slate-900/90 px-5 py-3 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            <span class="font-bold text-xs text-slate-200 code-font ml-2">ch02_trapezoid_area.py</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="loadCodeToSpyder('code-ex-2')" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-desktop"></i>
+                                <span>載入模擬器</span>
+                            </button>
+                            <button onclick="copyCode('code-ex-2', this)" class="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                                <i class="fa-regular fa-copy"></i>
+                                <span>複製程式碼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5 flex-grow space-y-2">
+                        <p class="text-xs text-slate-400"><strong>範例目標：</strong>算術運算與用戶輸入轉型。計算梯形土地面積。</p>
+                        <pre><code id="code-ex-2" class="code-font text-xs text-slate-200 leading-relaxed block overflow-x-auto bg-slate-950 p-4 rounded-xl border border-slate-800"># -*- coding: utf-8 -*-
+"""
+檔名: ch02_trapezoid_area.py
+說明: 計算梯形土地面積 (互動輸入型)
+"""
+
+print("--- 梯形面積計算器 ---")
+
+# 將 input() 取得之字串強制轉換為 float 浮點數
+top = float(input("請輸入梯形上底長度: "))
+bottom = float(input("請輸入梯形下底長度: "))
+height = float(input("請輸入梯形高度: "))
+
+# 計算面積公式
+area = (top + bottom) * height / 2
+
+print(f"\n計算結果：梯形面積為 {area:.2f} 平方單位")
+</code></pre>
+                    </div>
+                </div>
+
+                <!-- Example 3: Compound Interest Calculator -->
+                <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden flex flex-col">
+                    <div class="bg-slate-900/90 px-5 py-3 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            <span class="font-bold text-xs text-slate-200 code-font ml-2">ch02_compound_interest.py</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="loadCodeToSpyder('code-ex-3')" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-desktop"></i>
+                                <span>載入模擬器</span>
+                            </button>
+                            <button onclick="copyCode('code-ex-3', this)" class="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                                <i class="fa-regular fa-copy"></i>
+                                <span>複製程式碼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5 flex-grow space-y-2">
+                        <p class="text-xs text-slate-400"><strong>範例目標：</strong>應用複合指定運算子與次方運算 `**`。計算存款複利。</p>
+                        <pre><code id="code-ex-3" class="code-font text-xs text-slate-200 leading-relaxed block overflow-x-auto bg-slate-950 p-4 rounded-xl border border-slate-800"># -*- coding: utf-8 -*-
+"""
+檔名: ch02_compound_interest.py
+說明: 複利本金計算 (使用複合指定運算子 **= 與 *=)
+"""
+
+rate = 0.02   # 年利率 2%
+years = 6     # 存款年數
+
+deposit = float(input("請輸入本金存款金額: "))
+
+# 計算複利倍數 (1 + rate) ** years
+factor = (1 + rate) ** years
+deposit *= factor
+
+print(f"\n以年利率 {rate*100}% 計算")
+print(f"{years} 年後複利本利和為: {deposit:.2f} 元")
+</code></pre>
+                    </div>
+                </div>
+
+                <!-- Example 4: BMI Health Report Calculator -->
+                <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden flex flex-col">
+                    <div class="bg-slate-900/90 px-5 py-3 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            <span class="font-bold text-xs text-slate-200 code-font ml-2">ch02_bmi_calculator.py</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="loadCodeToSpyder('code-ex-4')" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-desktop"></i>
+                                <span>載入模擬器</span>
+                            </button>
+                            <button onclick="copyCode('code-ex-4', this)" class="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                                <i class="fa-regular fa-copy"></i>
+                                <span>複製程式碼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5 flex-grow space-y-2">
+                        <p class="text-xs text-slate-400"><strong>實戰範例：</strong>BMI 身體質量指數計算與型態轉換整合。</p>
+                        <pre><code id="code-ex-4" class="code-font text-xs text-slate-200 leading-relaxed block overflow-x-auto bg-slate-950 p-4 rounded-xl border border-slate-800"># -*- coding: utf-8 -*-
+"""
+檔名: ch02_bmi_calculator.py
+說明: 身高體重輸入與 BMI 格式化輸出
+"""
+
+name = input("請輸入您的姓名: ")
+height_cm = float(input("請輸入身高 (公分): "))
+weight_kg = float(input("請輸入體重 (公斤): "))
+
+# 公分轉公尺並計算 BMI = 體重 / (身高m ** 2)
+height_m = height_cm / 100
+bmi = weight_kg / (height_m ** 2)
+
+print(f"\n{"健康檢測簡報":=^30}")
+print(f"姓名: {name}")
+print(f"身高: {height_cm:.1f} cm | 體重: {weight_kg:.1f} kg")
+print(f"您的 BMI 計算數值為: {bmi:.2f}")
+</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Self-Test Quiz Section -->
+        <section id="quiz" class="glass-panel p-8 rounded-3xl border border-slate-800 space-y-6 glow-border">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 font-bold">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">CH01 ~ CH02 觀念隨堂總測驗</h3>
+                        <p class="text-xs text-slate-400">即時檢測您的 Python 基礎語法與運算思維掌握度</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="resetQuiz()" class="text-xs text-slate-400 hover:text-slate-200 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                        <i class="fa-solid fa-rotate-left mr-1"></i>重置測驗
+                    </button>
+                    <span id="quiz-score-badge" class="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-lg font-mono">
+                        完成度: <span id="quiz-completed-count" class="text-cyan-400 font-bold">0</span> / 5 題
+                    </span>
+                </div>
+            </div>
+
+            <!-- Quiz Questions List -->
+            <div class="space-y-6 text-xs">
+                <!-- Q1 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3 quiz-card">
+                    <div class="font-bold text-sm text-slate-200">1. 下列哪一個變數名稱在 Python 中是完全合法且安全的？</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        <button onclick="checkAnswer(this, false, 'class 是 Python 保留字，不可作為變數。')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">A) class</button>
+                        <button onclick="checkAnswer(this, false, '變數名稱開頭不能為數字。')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">B) 2nd_score</button>
+                        <button onclick="checkAnswer(this, true, '正確！底線開頭且不含保留字為完全合法名稱。')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">C) _user_score</button>
+                        <button onclick="checkAnswer(this, false, '不可包含減號/連字號 -')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">D) total-cost</button>
+                    </div>
+                    <div class="quiz-feedback hidden p-3 rounded-xl text-xs"></div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3 quiz-card">
+                    <div class="font-bold text-sm text-slate-200">2. 執行 <code class="code-font text-cyan-300">print(17 // 5)</code> 與 <code class="code-font text-cyan-300">print(17 % 5)</code>，輸出結果分別為何？</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        <button onclick="checkAnswer(this, true, '正確！// 為整數商 (3)，% 為餘數 (2)。')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">A) 3 與 2</button>
+                        <button onclick="checkAnswer(this, false, '// 為取整數商而非浮點除法')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">B) 3.4 與 2</button>
+                        <button onclick="checkAnswer(this, false, '順序顛倒了')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">C) 2 與 3</button>
+                        <button onclick="checkAnswer(this, false, 'Incorrect')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">D) 3 與 0</button>
+                    </div>
+                    <div class="quiz-feedback hidden p-3 rounded-xl text-xs"></div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3 quiz-card">
+                    <div class="font-bold text-sm text-slate-200">3. 關於 Python 的 <code class="code-font text-cyan-300">input()</code> 函式，下列敘述何者正確？</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        <button onclick="checkAnswer(this, false, '錯，若輸入數字仍會被視為字串。')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">A) 會自動判斷輸入為整數或字串</button>
+                        <button onclick="checkAnswer(this, true, '正確！input() 回傳型態固定為 str，進行數字運算前必須轉型。')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">B) 不論輸入內容為何，回傳型態永遠是 str</button>
+                        <button onclick="checkAnswer(this, false, '錯，只能輸入單行文字')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">C) 只能接收數字輸入，無法接收中文</button>
+                        <button onclick="checkAnswer(this, false, '錯，input() 會暫停程式等待輸入')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">D) 執行時不會暫停等待使用者輸入</button>
+                    </div>
+                    <div class="quiz-feedback hidden p-3 rounded-xl text-xs"></div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3 quiz-card">
+                    <div class="font-bold text-sm text-slate-200">4. 在 Spyder IDE 中，想要將目前的檔案完全執行並在 IPython Console 印出結果，應按哪個快捷鍵？</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        <button onclick="checkAnswer(this, true, '正確！F5 為 Spyder 執行 Run File 的標準快捷鍵。')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">A) F5</button>
+                        <button onclick="checkAnswer(this, false, 'F12 為設定/取消中斷點')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">B) F12</button>
+                        <button onclick="checkAnswer(this, false, 'Ctrl+1 為註解切換')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">C) Ctrl + 1</button>
+                        <button onclick="checkAnswer(this, false, 'Tab 為代碼自動補全')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">D) Tab</button>
+                    </div>
+                    <div class="quiz-feedback hidden p-3 rounded-xl text-xs"></div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3 quiz-card">
+                    <div class="font-bold text-sm text-slate-200">5. 執行 <code class="code-font text-cyan-300">print(f"{3.14159:.2f}")</code> 的輸出結果為何？</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        <button onclick="checkAnswer(this, false, '沒有做兩位小數四捨五入')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">A) 3.14159</button>
+                        <button onclick="checkAnswer(this, true, '正確！:.2f 代表格式化為小數點後兩位 (3.14)。')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">B) 3.14</button>
+                        <button onclick="checkAnswer(this, false, 'Incorrect')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">C) 3.1</button>
+                        <button onclick="checkAnswer(this, false, 'Incorrect')" class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">D) 3.142</button>
+                    </div>
+                    <div class="quiz-feedback hidden p-3 rounded-xl text-xs"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-800 bg-slate-950 py-8 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p class="font-medium text-slate-400">Python 零基礎入門班 • 深度互動數位講義 (Spyder IDE 學習專用版)</p>
+            <p class="text-slate-600">本講義整合運算思維、記憶體模型、F-String 格式化與 Spyder 開發除錯技巧。</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic JavaScript -->
+    <script>
+        // Spyder Live Memory Variables Database
+        let currentSpyderVariables = {
+            'name': { type: 'str', value: "'學生小明'", colorClass: 'text-amber-300' },
+            'score': { type: 'float', value: '88.5', colorClass: 'text-cyan-300' },
+            'passed': { type: 'bool', value: 'True', colorClass: 'text-emerald-400' }
+        };
+        let consoleInCount = 2;
+
+        // Copy Code Functionality
+        function copyCode(elementId, btnElement) {
+            const codeText = document.getElementById(elementId).innerText;
+            
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast('複製成功！', '已複製至剪貼簿，可直接貼上至 Spyder 執行。');
+                
+                const originalHTML = btnElement.innerHTML;
+                btnElement.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i><span class="text-emerald-400">已複製！</span>`;
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHTML;
+                }, 2000);
+            } catch (err) {
+                console.error('複製失敗: ', err);
+            } finally {
+                document.body.removeChild(tempTextArea);
+            }
+        }
+
+        // Toast Notification System
+        function showToast(title, desc, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-desc').innerText = desc;
+
+            if(isError) {
+                icon.className = "fa-solid fa-triangle-exclamation text-xl text-rose-400";
+            } else {
+                icon.className = "fa-solid fa-circle-check text-xl text-emerald-400";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Memory Simulator Dynamic Renderer
+        function updateMemorySim() {
+            const var1 = document.getElementById('sim-var-1').value || 'Fruit';
+            const val1 = document.getElementById('sim-val-1').value || 'apple';
+            const var2 = document.getElementById('sim-var-2').value || 'Animal';
+            const val2 = document.getElementById('sim-val-2').value || 'bear';
+
+            const container = document.getElementById('memory-blocks');
+            container.innerHTML = '';
+
+            const addresses = ['0x7ffe810', '0x7ffe814', '0x7ffe818', '0x7ffe81C'];
+            
+            addresses.forEach((addr, idx) => {
+                const isVar1 = idx === 1;
+                const isVar2 = idx === 2;
+
+                const block = document.createElement('div');
+                block.className = `p-2 rounded-xl border text-center font-mono text-[11px] transition-all duration-300 ${
+                    isVar1 ? 'bg-cyan-950/80 border-cyan-500/80 text-cyan-300 scale-105 shadow-lg shadow-cyan-500/10' :
+                    isVar2 ? 'bg-purple-950/80 border-purple-500/80 text-purple-300 scale-105 shadow-lg shadow-purple-500/10' :
+                    'bg-slate-900/50 border-slate-800 text-slate-600'
+                }`;
+
+                let content = `<div class="text-[9px] text-slate-500">${addr}</div>`;
+                if (isVar1) {
+                    content += `<div class="font-bold border-t border-cyan-800/80 mt-1 pt-1">${val1}</div>`;
+                    content += `<div class="text-[9px] bg-cyan-900/80 text-cyan-200 rounded px-1 mt-1">標籤: ${var1}</div>`;
+                } else if (isVar2) {
+                    content += `<div class="font-bold border-t border-purple-800/80 mt-1 pt-1">${val2}</div>`;
+                    content += `<div class="text-[9px] bg-purple-900/80 text-purple-200 rounded px-1 mt-1">標籤: ${var2}</div>`;
+                } else {
+                    content += `<div class="mt-2 text-slate-700">(空閒 RAM)</div>`;
+                }
+
+                block.innerHTML = content;
+                container.appendChild(block);
+            });
+        }
+
+        // Render Variable Explorer Table
+        function renderSpyderVarTable() {
+            const tableBody = document.getElementById('spyder-var-table');
+            const varKeys = Object.keys(currentSpyderVariables);
+            document.getElementById('spyder-var-count').innerText = `${varKeys.length} 個變數在記憶體中`;
+
+            let html = '';
+            varKeys.forEach(k => {
+                const item = currentSpyderVariables[k];
+                html += `<tr>
+                    <td class="p-1 text-cyan-300">${k}</td>
+                    <td class="p-1 text-slate-500">${item.type}</td>
+                    <td class="p-1 ${item.colorClass}">${item.value}</td>
+                </tr>`;
+            });
+            tableBody.innerHTML = html;
+        }
+
+        // Live Console Command Evaluation
+        function handleConsoleSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('spyder-console-input');
+            const cmd = inputEl.value.trim();
+            if (!cmd) return;
+
+            const consoleOut = document.getElementById('spyder-console-output');
+            
+            // Append Command
+            let newLog = `<p class="text-emerald-400">In [${consoleInCount}]: ${cmd}</p>`;
+
+            // Simple parser for assignment e.g. x = 100 or x = "hello"
+            if (cmd.includes('=')) {
+                const parts = cmd.split('=');
+                const varName = parts[0].trim();
+                const valStr = parts[1].trim();
+
+                if (/^[a-zA-Z_]\w*$/.test(varName)) {
+                    let typeStr = 'int';
+                    let valDisplay = valStr;
+                    let colorClass = 'text-cyan-300';
+
+                    if (!isNaN(valStr)) {
+                        typeStr = valStr.includes('.') ? 'float' : 'int';
+                    } else if (valStr === 'True' || valStr === 'False') {
+                        typeStr = 'bool';
+                        colorClass = 'text-emerald-400';
+                    } else {
+                        typeStr = 'str';
+                        colorClass = 'text-amber-300';
+                    }
+
+                    currentSpyderVariables[varName] = {
+                        type: typeStr,
+                        value: valDisplay,
+                        colorClass: colorClass
+                    };
+                    renderSpyderVarTable();
+                    newLog += `<p class="text-slate-400 text-[10px]">[Spyder Log] 變數 '${varName}' 已成功寫入 Variable Explorer。</p>`;
+                }
+            } else if (cmd.startsWith('print(') && cmd.endsWith(')')) {
+                const inner = cmd.substring(6, cmd.length - 1).trim();
+                if (currentSpyderVariables[inner]) {
+                    newLog += `<p class="text-slate-200">${currentSpyderVariables[inner].value}</p>`;
+                } else if ((inner.startsWith('"') && inner.endsWith('"')) || (inner.startsWith("'") && inner.endsWith("'"))) {
+                    newLog += `<p class="text-slate-200">${inner.slice(1, -1)}</p>`;
+                } else {
+                    try {
+                        newLog += `<p class="text-slate-200">${eval(inner)}</p>`;
+                    } catch(err) {
+                        newLog += `<p class="text-rose-400">NameError: name '${inner}' is not defined</p>`;
+                    }
+                }
+            } else {
+                try {
+                    // Try JS math evaluation
+                    const res = eval(cmd.replace(/^[a-zA-Z_]\w*$/, (m) => currentSpyderVariables[m] ? currentSpyderVariables[m].value : m));
+                    newLog += `<p class="text-slate-200">${res}</p>`;
+                } catch (err) {
+                    newLog += `<p class="text-rose-400">SyntaxError: invalid syntax or undefined variable in simulation</p>`;
+                }
+            }
+
+            consoleOut.innerHTML += newLog;
+            consoleOut.scrollTop = consoleOut.scrollHeight;
+            inputEl.value = '';
+            consoleInCount++;
+            document.getElementById('console-in-num').innerText = consoleInCount;
+        }
+
+        // Spyder IDE Simulation Interactivity
+        function selectPane(paneType) {
+            const detailBox = document.getElementById('pane-detail-card');
+            if (paneType === 'editor') {
+                detailBox.innerHTML = `<span class="font-bold text-blue-400 block mb-1">1. 程式編輯區 (Editor)</span>在此處撰寫與編輯 .py 程式碼檔。Spyder 提供語法高亮、語法錯誤即時提示（左側紅黃警戒）與 Tab 自動補全。按 F5 即可直接執行此區檔案。`;
+            } else if (paneType === 'variables') {
+                detailBox.innerHTML = `<span class="font-bold text-purple-400 block mb-1">2. 變數瀏覽區 (Variable Explorer)</span>非常強大的開發輔助工具！會即時列出目前記憶體中所有的變數名稱 (Name)、資料型態 (Type) 與內容數值 (Value)。點擊變數還可直接預覽或修改內容。`;
+            } else if (paneType === 'console') {
+                detailBox.innerHTML = `<span class="font-bold text-emerald-400 block mb-1">3. IPython 命令視窗 (Console)</span>程式執行後的 print() 輸出結果會在此處顯示。您也可以直接在下方輸入框輸入單行 Python 指令（例如 <code class="code-font text-cyan-300">a = 100</code>）體驗即時互動算數。`;
+            }
+        }
+
+        function runSpyderSimulation() {
+            const consoleOut = document.getElementById('spyder-console-output');
+            consoleOut.innerHTML = `
+                <p class="text-slate-600">IPython 7.31.1 -- An enhanced Interactive Python.</p>
+                <p class="text-emerald-400">In [${consoleInCount}]: runfile('demo_script.py')</p>
+                <p class="text-slate-100 font-bold bg-slate-900 p-1.5 rounded border border-slate-800">學生小明 測驗結果: True</p>
+            `;
+            consoleInCount++;
+            document.getElementById('console-in-num').innerText = consoleInCount;
+            selectPane('console');
+        }
+
+        function resetSpyderSimulator() {
+            currentSpyderVariables = {
+                'name': { type: 'str', value: "'學生小明'", colorClass: 'text-amber-300' },
+                'score': { type: 'float', value: '88.5', colorClass: 'text-cyan-300' },
+                'passed': { type: 'bool', value: 'True', colorClass: 'text-emerald-400' }
+            };
+            renderSpyderVarTable();
+            consoleInCount = 1;
+            document.getElementById('spyder-console-output').innerHTML = `<p class="text-slate-600">IPython Console 重置完畢。</p>`;
+            document.getElementById('console-in-num').innerText = '1';
+            showToast('已重置模擬器', 'Spyder 變數與 Console 狀態已回復預設。');
+        }
+
+        // Quick Load Code Snippet from Library to Spyder Simulator
+        function loadCodeToSpyder(codeId) {
+            const rawCode = document.getElementById(codeId).innerText;
+            const editorCode = document.getElementById('spyder-editor-code');
+            editorCode.innerText = rawCode;
+
+            // Scroll to simulator smooth
+            document.getElementById('spyder-interactive').scrollIntoView({ behavior: 'smooth' });
+            showToast('已載入至 Spyder 模擬器！', '已成功載入程式碼至編輯區，點擊 F5 即可測試執行。');
+        }
+
+        // Spyder Common Beginner Errors Cases
+        const errorCases = {
+            'type-error': {
+                title: 'TypeError: can only concatenate str (not "int") to str',
+                badCode: `age = 18\nprint("我的年齡是: " + age)  # ❌ 錯誤：無法將字串與整數直接加號相連`,
+                traceback: `TypeError: can only concatenate str (not "int") to str`,
+                explanation: `在 Python 中，加號 (+) 若一方為字串 (str)，另一方也必須為字串。若直接加 int 會爆發 TypeError。`,
+                solutionCode: `age = 18\nprint("我的年齡是: " + str(age))  # 解法1：用 str() 轉型\nprint(f"我的年齡是: {age}")         # 解法2 (推薦)：使用 F-String`
+            },
+            'indent-error': {
+                title: 'IndentationError: unexpected indent / expected an indented block',
+                badCode: ` age = 18  # ❌ 錯誤：第一行開頭不小心按到空白鍵縮排`,
+                traceback: `IndentationError: unexpected indent`,
+                explanation: `Python 嚴格使用「縮排 (Indentation)」來區分程式區塊（如 if, for, def）。一般程式碼開頭不可隨意留空格。`,
+                solutionCode: `age = 18  # ✅ 正確：頂格書寫，移除開頭多餘空格`
+            },
+            'name-error': {
+                title: 'NameError: name \'score\' is not defined',
+                badCode: `print(Score)  # ❌ 錯誤：變數名稱為 score (小寫)，拼錯寫成 Score (大寫)`,
+                traceback: `NameError: name 'Score' is not defined`,
+                explanation: `Python 嚴格區分大小寫！變數若未先宣告賦值（或名稱拼錯）直接使用，直譯器會找不到名稱。`,
+                solutionCode: `score = 90\nprint(score)  # ✅ 正確：注意大小寫一致`
+            },
+            'syntax-error': {
+                title: 'SyntaxError: invalid syntax (語法不合法)',
+                badCode: `if age >= 18  # ❌ 錯誤：if 條件式末端漏掉冒號 (:)\n    print("已成年")`,
+                traceback: `SyntaxError: expected ':'`,
+                explanation: `遺漏括號、引號未對稱封閉、漏掉冒號或誤用 `=` 代替 `==` 均會引發語法錯誤。Spyder 在編輯器左側會顯示紅色小問號警告。`,
+                solutionCode: `if age >= 18: # ✅ 正確：補上結尾冒號 :\n    print("已成年")`
+            }
+        };
+
+        function showErrorCase(type) {
+            // Update active button state
+            document.querySelectorAll('.error-btn').forEach(btn => {
+                btn.classList.remove('border-rose-500/50', 'bg-rose-950/40', 'text-rose-300');
+                btn.classList.add('border-slate-700', 'bg-slate-900', 'text-slate-300');
+            });
+            event.currentTarget.classList.add('border-rose-500/50', 'bg-rose-950/40', 'text-rose-300');
+
+            const item = errorCases[type];
+            const diagCard = document.getElementById('error-diag-card');
+            diagCard.innerHTML = `
+                <div class="text-rose-400 font-bold text-sm border-b border-slate-800 pb-2">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i>${item.title}
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <span class="text-rose-300 text-[11px] font-bold">❌ 錯誤寫法 (Bad Code):</span>
+                        <pre class="bg-slate-900 p-2.5 rounded border border-rose-900/50 text-rose-200 text-xs">${item.badCode}</pre>
+                        <span class="text-rose-400 text-[11px] font-bold">Spyder Traceback 報錯訊息:</span>
+                        <div class="bg-rose-950/40 p-2 rounded text-rose-300 text-[11px] border border-rose-800/60">${item.traceback}</div>
+                    </div>
+                    <div class="space-y-2">
+                        <span class="text-emerald-400 text-[11px] font-bold">✅ 修正解答 (Solution):</span>
+                        <pre class="bg-slate-900 p-2.5 rounded border border-emerald-900/50 text-emerald-200 text-xs">${item.solutionCode}</pre>
+                        <div class="text-slate-400 text-[11px] font-sans bg-slate-900/60 p-2 rounded border border-slate-800">
+                            <strong>💡 原因解析：</strong>${item.explanation}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // F-String Live Playground Updater
+        function updateFStringPreview() {
+            const name = document.getElementById('fmt-name').value || '無名氏';
+            const score = parseFloat(document.getElementById('fmt-score').value) || 0;
+            const width = parseInt(document.getElementById('fmt-width').value) || 10;
+            const precision = parseInt(document.getElementById('fmt-precision').value) || 2;
+
+            // Generate python code display text
+            const codeText = `print(f"{'${name}':<${width}} 得分: {${score}:${width}.${precision}f}")`;
+            document.getElementById('fmt-code-display').innerText = codeText;
+
+            // Simulate format
+            const formattedName = name.padEnd(width, ' ');
+            const formattedScore = score.toFixed(precision).padStart(width, ' ');
+            document.getElementById('fmt-result-display').innerText = `${formattedName} 得分: ${formattedScore}`;
+        }
+
+        // Operator Live Evaluator
+        function evalExpr(expr) {
+            const box = document.getElementById('eval-result-box');
+            box.classList.remove('hidden');
+            let res = 0;
+            let explanation = '';
+
+            if (expr === '17 // 5') {
+                res = Math.floor(17 / 5);
+                explanation = `17 除以 5 的整數商為 ${res} (忽略小數部分)`;
+            } else if (expr === '17 % 5') {
+                res = 17 % 5;
+                explanation = `17 除以 5 余 ${res} (取餘數)`;
+            } else if (expr === '2 ** 4') {
+                res = Math.pow(2, 4);
+                explanation = `2 的 4 次方 = 2 * 2 * 2 * 2 = ${res}`;
+            }
+
+            box.innerHTML = `<span class="text-slate-400">運算式:</span> <span class="text-amber-300">${expr}</span> ➔ <span class="text-emerald-400 font-bold">結果: ${res}</span> <span class="text-slate-500 text-[11px] block mt-1">說明: ${explanation}</span>`;
+        }
+
+        // Quiz Evaluation Logic with Score Tracker
+        let completedQuestions = 0;
+        function checkAnswer(btn, isCorrect, explanation) {
+            const parent = btn.parentElement;
+            const buttons = parent.querySelectorAll('button');
+            const feedback = parent.nextElementSibling;
+
+            buttons.forEach(b => {
+                b.disabled = true;
+                b.classList.add('opacity-50');
+            });
+
+            btn.classList.remove('opacity-50');
+            if (isCorrect) {
+                btn.classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-300');
+                feedback.classList.remove('hidden');
+                feedback.className = 'quiz-feedback mt-2 p-3 rounded-xl text-xs bg-emerald-950/80 border border-emerald-500/50 text-emerald-300';
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i> 答對了！${explanation}`;
+            } else {
+                btn.classList.add('bg-rose-950', 'border-rose-500', 'text-rose-300');
+                feedback.classList.remove('hidden');
+                feedback.className = 'quiz-feedback mt-2 p-3 rounded-xl text-xs bg-rose-950/80 border border-rose-500/50 text-rose-300';
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-400"></i> 答案不正確。${explanation}`;
+            }
+
+            completedQuestions++;
+            document.getElementById('quiz-completed-count').innerText = completedQuestions;
+            updateProgressBar();
+        }
+
+        function resetQuiz() {
+            completedQuestions = 0;
+            document.getElementById('quiz-completed-count').innerText = '0';
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                const buttons = card.querySelectorAll('button');
+                buttons.forEach(b => {
+                    b.disabled = false;
+                    b.className = 'text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition';
+                });
+                const fb = card.querySelector('.quiz-feedback');
+                fb.classList.add('hidden');
+            });
+            updateProgressBar();
+            showToast('測驗已重置', '可以重新進行 5 題觀念挑戰！');
+        }
+
+        // Top Reading Progress Bar Listener
+        function updateProgressBar() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            
+            // Factor quiz completed as well
+            const finalProgress = Math.min(100, Math.max(scrollPercent, (completedQuestions / 5) * 100));
+            document.getElementById('learning-progress-bar').style.width = `${finalProgress}%`;
+        }
+
+        window.addEventListener('scroll', updateProgressBar);
+
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Initial setup on page load
+        window.onload = function() {
+            updateMemorySim();
+            updateFStringPreview();
+            showErrorCase('type-error');
+            renderSpyderVarTable();
+        };
+    </script>
+</body>
+</html>
